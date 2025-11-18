@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from "react";
+import React, { useEffect} from "react";
 import axios from "axios";
 import {Formik, Form, Field, ErrorMessage} from 'formik'
 import * as Yup from 'yup';
@@ -6,7 +6,7 @@ import {useNavigate} from 'react-router-dom'
 
 
 function CreatePost() {
-
+    let navigate = useNavigate();
     const initialValues = {
         title: '',
         postText: '',
@@ -17,7 +17,7 @@ function CreatePost() {
         if(!localStorage.getItem('accessToken')){
             navigate('/login');
         }
-    }, [])
+    }, []);
 
     const validationSchema = Yup.object().shape({
         title: Yup.string().required(),
@@ -35,7 +35,7 @@ function CreatePost() {
 
     }
 
-    let navigate = useNavigate();
+
 
     return (
         <div className="createPostPage">

@@ -4,6 +4,7 @@ const router = express.Router();
 
 const {Posts, Likes} = require("../models");
 const {validateToken} = require("../middlewares/AuthMiddleware");
+const {where} = require("sequelize");
 
 
 router.get("/", validateToken, async (req, res) => {
@@ -20,9 +21,21 @@ router.get("/byId/:id", async (req, res) => {
 
 })
 
+router.get("/byUserId/:id", async (req, res) => {
+    const id = req.params.id;
+    const posts = await Posts.findAll({
+        where: { UserId: id },
+        include: [Likes]
+    });
+    // const posts = await Posts.findAll({where:{UserId: id}},{includes:[Likes]});
+    res.json(posts);
+
+})
+
 router.post("/", validateToken, async (req, res) => {
     const post = req.body;
     post.username = req.user.username;
+    post.UserId = req.user.id;
     await Posts.create(post);
     res.json(post);
 })

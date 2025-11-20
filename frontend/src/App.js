@@ -8,6 +8,7 @@ import Registration from './pages/Registration'
 import Login from './pages/Login'
 import PageNotFound from './pages/PageNotFound'
 import Profile from './pages/Profile'
+import ChangePassword from './pages/ChangePassword'
 import {AuthContext} from './helpers/AuthContext'
 
 import {useState, useEffect} from "react";
@@ -79,6 +80,7 @@ function App() {
                         <Route path="/registration" element={<Registration/>}/>
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/profile/:id" element={<Profile/>}/>
+                        <Route path="/changepassword" element={<ChangePassword/>}/>
                         <Route path ="*" exact element={<PageNotFound/>}/>
                     </Routes>
                 </Router>

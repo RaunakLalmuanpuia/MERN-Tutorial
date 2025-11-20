@@ -24,25 +24,32 @@ router.post("/", async (req, res) => {
 })
 
 router.post("/login", async (req, res) => {
+    const { username, password } = req.body;
 
-    const {username, password} = req.body;
-    const user = await Users.findOne({where: {username : username}});
+    const user = await Users.findOne({ where: { username } });
 
     if (!user) {
-        res.json({error: "Username Doesn't Exist"});
+        return res.json({ error: "Username Doesn't Exist" });
     }
 
-    bcrypt.compare(password, user.password).then((match)=>{
-        if(!match) {
-            res.json({error: "Passwords do not match"});
-        }
+    const match = await bcrypt.compare(password, user.password);
 
-        const accessToken = sign({username: user.username, id: user.id},"Secret");
-        res.json({token: accessToken, username: username, id: user.id});
+    if (!match) {
+        return res.json({ error: "Passwords do not match" });
+    }
 
+    const accessToken = sign(
+        { username: user.username, id: user.id },
+        "Secret"
+    );
 
+    return res.json({
+        token: accessToken,
+        username: user.username,
+        id: user.id
     });
-})
+});
+
 
 router.get("/auth", validateToken, async (req, res) => {
     res.json(req.user);
@@ -56,4 +63,28 @@ router.get("/basicInfo/:id", async (req, res) => {
 
     res.json(basicInfo);
 })
+
+router.put("/changepassword", validateToken, async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await Users.findOne({
+        where: { username: req.user.username }
+    });
+
+    const match = await bcrypt.compare(oldPassword, user.password);
+
+    if (!match) {
+        return res.json({ error: "Wrong Password Entered!" });
+    }
+
+    const hash = await bcrypt.hash(newPassword, 10);
+
+    await Users.update(
+        { password: hash },
+        { where: { username: req.user.username } }
+    );
+
+    return res.json({ success: true, message: "Password updated successfully" });
+});
+
 module.exports = router;
